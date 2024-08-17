@@ -159,7 +159,7 @@ function clearCart() {
 
 
 // Set your publishable key from Stripe
-const stripe = Stripe('pk_test_51PoC52K4kIROIBXXLjTzf0tEOIV1urYhCLRNCS9HaUCR1G4oYbHUszKFBe0GbIh9j2zXsVT10pwIykx55oyboiFC004u4l2oyt');
+const stripe = Stripe('pk_live_51PoC52K4kIROIBXXNAWmsWrzPMuDyENTVlxlCTdyeYs0zgQiebILKf4N3wttIQSHe4O7rmfb0mPlskGCVBrSMGTL00uiQeLu9g');
 const elements = stripe.elements();
 
 // Create an instance of the card Element
