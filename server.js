@@ -25,8 +25,20 @@ const getProducts = async () => {
 
 const createOrder = async (orderData) => {
   try {
-    const response = await cjApi.post('https://developers.cjdropshipping.com/api2.0/v1/shopping/order/createOrder', orderData); // Replace with actual endpoint
-    return response.data;
+    // Create a Payment Intent with the order amount
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: orderData.amount, // Specify the order amount here
+      currency: 'usd', // Specify the currency
+      payment_method_types: ['card'],
+    });
+
+    // Make the request to create the order
+    const response = await cjApi.post('https://developers.cjdropshipping.com/api2.0/v1/shopping/order/createOrder', orderData);
+
+    return {
+      paymentIntent,
+      orderResponse: response.data
+    };
   } catch (error) {
     console.error('Error creating order:', error);
     throw error;
