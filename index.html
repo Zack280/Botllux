@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Store Name</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="" href="">
 </head>
 <body>
     <header>
@@ -45,23 +46,23 @@
         <div class="container">
             <h2>Featured Products</h2>
             <div class="product-grid">
-                <div class="product-card" data-id="1">
+                <div class="product-card" data-product-id="1">
                     <img src="https://oss.yesourcing.com/7059b3a7-a147-4bc3-84c0-514b8cc22868.jpg?x-oss-process=image/format,webp,image/resize,m_fill,m_pad,w_800,h_800" alt="Product 1">
                     <h3>Tritan Large Capacity Frosted Cup Copper Lid (White)</h3>
                     <p class="price">$15.99</p>
-                    <a href="#" class="add-to-cart-button">Add to Cart</a>
+                    <button class="add-to-cart-button" onclick="addToCart({ id: 1, name: 'Tritan Large Capacity Frosted Cup Copper Lid (White)', price: 15.99, quantity: 1, image: 'https://oss.yesourcing.com/7059b3a7-a147-4bc3-84c0-514b8cc22868.jpg?x-oss-process=image/format,webp,image/resize,m_fill,m_pad,w_800,h_800' })">Add to Cart</button>
                 </div>
-                <div class="product-card" data-id="2">
+                <div class="product-card" data-product-id="2">
                     <img src="https://oss.yesourcing.com/714113fe-7bc8-4f85-b31a-28ddfc150223.png?x-oss-process=image/format,webp,image/resize,m_fill,m_pad,w_800,h_800" alt="Product 2">
                     <h3>Tritan Large Capacity Frosted Cup Copper Lid (Pink)</h3>
                     <p class="price">$15.99</p>
-                    <a href="#" class="add-to-cart-button">Add to Cart</a>
+                    <button class="add-to-cart-button" onclick="addToCart({ id: 2, name: 'Tritan Large Capacity Frosted Cup Copper Lid (Pink)', price: 15.99, quantity: 1, image: 'https://oss.yesourcing.com/714113fe-7bc8-4f85-b31a-28ddfc150223.png?x-oss-process=image/format,webp,image/resize,m_fill,m_pad,w_800,h_800' })">Add to Cart</button>
                 </div>
-                <div class="product-card" data-id="3">
-                    <img src="https://oss.yesourcing.com/606b152b-f768-4de2-8918-ed15780255a0.png?x-oss-process=image/format,webp,image/resize,m_fill,m_pad,w_800,h_800" alt="Product 2">
+                <div class="product-card" data-product-id="3">
+                    <img src="https://oss.yesourcing.com/606b152b-f768-4de2-8918-ed15780255a0.png?x-oss-process=image/format,webp,image/resize,m_fill,m_pad,w_800,h_800" alt="Product 3">
                     <h3>Tritan Large Capacity Frosted Cup Copper Lid (Black)</h3>
                     <p class="price">$15.99</p>
-                    <a href="#" class="add-to-cart-button">Add to Cart</a>
+                    <button class="add-to-cart-button" onclick="addToCart({ id: 3, name: 'Tritan Large Capacity Frosted Cup Copper Lid (Black)', price: 15.99, quantity: 1, image: 'https://oss.yesourcing.com/606b152b-f768-4de2-8918-ed15780255a0.png?x-oss-process=image/format,webp,image/resize,m_fill,m_pad,w_800,h_800' })">Add to Cart</button>
                 </div>
                 <!-- More product cards can be added here -->
             </div>
@@ -121,5 +122,6 @@
     </footer>
 
     <script src="script.js"></script>
+    <div class="cart-items" style="display: none;"></div>
 </body>
 </html>

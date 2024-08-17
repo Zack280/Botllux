@@ -1,120 +1,216 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Add to Cart Buttons
-    const addToCartButtons = document.querySelectorAll('.add-to-cart-button');
-    addToCartButtons.forEach(button => {
-        button.addEventListener('click', (event) => {
-            event.preventDefault();
-            
-            // Get product details from data attributes
-            const productElement = button.closest('.product-card');
-            const productId = productElement.dataset.productId;
-            const productName = productElement.querySelector('h3').textContent;
-            const productPrice = parseFloat(productElement.querySelector('.price').textContent.replace('$', ''));
-            const productQuantity = 1; // Default quantity to 1
 
-            console.log('Adding to cart:', { id: productId, name: productName, price: productPrice, quantity: productQuantity });
 
-            // Create product object
-            const product = {
-                id: productId,
-                name: productName,
-                price: productPrice,
-                quantity: productQuantity
-            };
 
-            // Add product to cart
-            addToCart(product);
 
-            // Optionally, show a message or update UI
-            alert('Item added to cart!');
-        });
+
+// Add to Cart Buttons
+const addToCartButtons = document.querySelectorAll('.add-to-cart-button');
+addToCartButtons.forEach(button => {
+    button.addEventListener('click', (event) => {
+        event.preventDefault();
+        
+        // Get product details from the product card
+        const productElement = button.closest('.product-card');
+        const productId = productElement.dataset.productId;
+        const productName = productElement.querySelector('h3').textContent;
+        const productPrice = parseFloat(productElement.querySelector('.price').textContent.replace('$', ''));
+        const productQuantity = 1; // Default quantity to 1
+        
+        // Get the image URL or use a default
+        const imageUrl = productElement.querySelector('img').src || 'https://i.ibb.co/qsTgdW5/Botlluxe.png'; 
+
+        console.log('Adding to cart:', { id: productId, name: productName, price: productPrice, quantity: productQuantity });
+
+        // Create product object
+        const product = {
+            id: productId,
+            name: productName,
+            price: productPrice,
+            quantity: productQuantity,
+            image: imageUrl
+        };
+
     });
-
-    // Contact Form Submission
-    const contactForm = document.querySelector('#contact form');
-    if (contactForm) {
-        contactForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            alert('Message sent! We will get back to you soon.');
-            contactForm.reset();
-        });
-    }
-
-    // Cart Functions
-    const cartContainer = document.querySelector('.cart-items');
-    if (cartContainer) {
-        loadCart();
-    }
 });
+
+// Contact Form Submission
+const contactForm = document.querySelector('#contact form');
+if (contactForm) {
+    contactForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert('Message sent! We will get back to you soon.');
+        contactForm.reset();
+    });
+}
+
+// Cart Functions
+loadCart();
 
 // Function to add an item to the cart
 function addToCart(product) {
-    let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
-    console.log('Current cart items:', cartItems);
+    const { id, name, price, quantity, image } = product;
 
-    const existingItemIndex = cartItems.findIndex(item => item.id === product.id);
-    
+    // Retrieve existing cart items from localStorage
+    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+
+    // Check if the item already exists in the cart
+    const existingItemIndex = cartItems.findIndex(item => item.id === id);
+
     if (existingItemIndex > -1) {
-        cartItems[existingItemIndex].quantity += product.quantity;
+        // If the item exists, update its quantity
+        cartItems[existingItemIndex].quantity += 1;
     } else {
-        cartItems.push(product);
+        // If the item does not exist, add it to the cart
+        cartItems.push({ id, name, price, image, quantity });
     }
 
-    console.log('Updated cart items:', cartItems);
-    localStorage.setItem('cart', JSON.stringify(cartItems));
+    // Save the updated cart items back to localStorage
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+
+    // Load the updated cart to refresh the display
+    loadCart();
 }
 
-// Function to load cart items
+
+
+// Function to load and display cart items
 function loadCart() {
-    const cartContainer = document.querySelector('.cart-items');
-    if (!cartContainer) {
-        console.error('Cart container not found');
+    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+    const cartItemsContainer = document.querySelector('.cart-items');
+    const totalItemsSpan = document.getElementById('total-items');
+    const totalPriceSpan = document.getElementById('total-price');
+
+    if (!cartItemsContainer) {
+        console.error("Cart items container not found!");
         return;
     }
 
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    console.log('Loaded cart items:', cart);
+    let totalItems = 0;
+    let totalPrice = 0;
 
-    if (cart.length === 0) {
-        cartContainer.innerHTML = '<p>Your cart is empty.</p>';
-        return;
-    }
+    // Clear existing items
+    cartItemsContainer.innerHTML = '';
 
-    cart.forEach(item => {
-        const cartItem = document.createElement('div');
-        cartItem.className = 'cart-item';
-        cartItem.innerHTML = `
-            <img src="https://example.com/product-image-${item.id}.jpg" alt="${item.name}">
+    cartItems.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.classList.add('cart-item');
+
+        const imageUrl = item.image || 'default-image-url.png';
+
+        const imageElement = document.createElement('img');
+        imageElement.src = imageUrl;
+        imageElement.alt = item.name;
+        imageElement.classList.add('cart-item-image');
+
+        imageElement.onerror = function() {
+            this.src = 'default-image-url.png';
+            this.alt = 'Image not available';
+        };
+
+        itemElement.appendChild(imageElement);
+
+        itemElement.innerHTML += `
             <div class="cart-item-details">
                 <h2>${item.name}</h2>
                 <p class="item-price">$${item.price.toFixed(2)}</p>
                 <p class="item-quantity">Quantity: ${item.quantity}</p>
                 <div class="item-actions">
-                    <button class="remove-from-cart-button" data-id="${item.id}">Remove</button>
+                    <button class="remove-button" data-id="${item.id}" onclick="removeFromCart(${item.id});">Remove</button>
                 </div>
             </div>
         `;
-        cartContainer.appendChild(cartItem);
+
+        cartItemsContainer.appendChild(itemElement);
+
+        totalItems += item.quantity;
+        totalPrice += item.price * item.quantity;
     });
 
-    // Add event listeners for remove buttons
-    document.querySelectorAll('.remove-from-cart-button').forEach(button => {
-        button.addEventListener('click', () => {
-            const productId = button.getAttribute('data-id');
-            console.log('Removing from cart:', productId);
-            removeFromCart(productId);
+    if (totalItemsSpan) {
+        totalItemsSpan.textContent = totalItems;
+    }
+    if (totalPriceSpan) {
+        totalPriceSpan.textContent = totalPrice.toFixed(2);
+    }
+
+    // Add event listeners to remove buttons
+    document.querySelectorAll('.remove-button').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const id = event.target.dataset.id;
+            removeFromCart(id);
         });
     });
 }
 
+
+
 // Function to remove an item from the cart
 function removeFromCart(id) {
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    console.log('Current cart before removal:', cart);
-
-    cart = cart.filter(item => item.id !== id);
-
-    console.log('Updated cart after removal:', cart);
-    localStorage.setItem('cart', JSON.stringify(cart));
-    location.reload(); // Reload page to reflect changes
+    let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+    cartItems = cartItems.filter(item => item.id !== id);
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    loadCart();
 }
+
+function clearCart() {
+    localStorage.removeItem('cartItems');  // This clears the cart in localStorage
+    loadCart();  // Reload the cart display (which will now be empty)
+}
+
+
+// Set your publishable key from Stripe
+const stripe = Stripe('pk_test_51PoC52K4kIROIBXXLjTzf0tEOIV1urYhCLRNCS9HaUCR1G4oYbHUszKFBe0GbIh9j2zXsVT10pwIykx55oyboiFC004u4l2oyt');
+const elements = stripe.elements();
+
+// Create an instance of the card Element
+const card = elements.create('card');
+
+// Add an instance of the card Element into the `card-element` div
+card.mount('#card-element');
+
+// Handle real-time validation errors from the card Element
+card.addEventListener('change', function(event) {
+    const displayError = document.getElementById('card-errors');
+    if (event.error) {
+        displayError.textContent = event.error.message;
+    } else {
+        displayError.textContent = '';
+    }
+});
+
+// Handle form submission
+const form = document.getElementById('payment-form');
+form.addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    // Create a payment method
+    const {paymentMethod, error} = await stripe.createPaymentMethod({
+        type: 'card',
+        card: card,
+    });
+
+    if (error) {
+        // Display error.message in your UI.
+        const displayError = document.getElementById('card-errors');
+        displayError.textContent = error.message;
+    } else {
+        // The payment method has been created, you can now use it to complete the payment.
+        // Send the paymentMethod.id to your server to complete the payment
+        fetch('/charge', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({paymentMethodId: paymentMethod.id})
+        }).then(function(response) {
+            return response.json();
+        }).then(function(paymentIntent) {
+            if (paymentIntent.error) {
+                displayError.textContent = paymentIntent.error;
+            } else {
+                // Payment was successful, redirect or show a success message
+                window.location.href = '/success';
+            }
+        });
+    }
+});
