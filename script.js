@@ -196,7 +196,7 @@ form.addEventListener('submit', async function(event) {
     } else {
         // The payment method has been created, you can now use it to complete the payment.
         // Send the paymentMethod.id to your server to complete the payment
-        fetch('https://developers.cjdropshipping.com/api2.0/v1/shopping/order/createOrder', {
+        fetch('https://developers.cjdropshipping.com/api2.0/v1/shopping/pay/payBalance', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
