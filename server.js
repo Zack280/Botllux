@@ -1,4 +1,6 @@
 const axios = require('axios');
+const stripe = require('stripe')('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');
+
 
 const apiKey = '33b93f0cf2c04545b812cd9a840f88ce';
 const apiUrl = 'https://api.cjdropshipping.com'; // Replace with the actual CJ Dropshipping API URL
