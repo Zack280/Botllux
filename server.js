@@ -1,39 +1,34 @@
-// server.js
-const express = require('express');
-const app = express();
-const stripe = require('stripe')('sk_test_51PoC52K4kIROIBXXCWPl4Wel4ghYynbVeIwkUtMNomHwdKqE7OVKL9rExHbemQRfS00dmij7kwl830xcmAKCOzsA00nOeatmSs');
-const cors = require('cors');
+const axios = require('axios');
 
-app.use(cors());
-app.use(express.json());
+const apiKey = '33b93f0cf2c04545b812cd9a840f88ce';
+const apiUrl = 'https://api.cjdropshipping.com'; // Replace with the actual CJ Dropshipping API URL
 
-app.post('/create-checkout-session', async (req, res) => {
-    const items = req.body.items;
-
-    // Format the items for Stripe
-    const lineItems = items.map(item => {
-        return {
-            price_data: {
-                currency: 'usd',
-                product_data: {
-                    name: item.name,
-                    images: [item.image],
-                },
-                unit_amount: Math.round(item.price * 100), // Stripe expects prices in cents
-            },
-            quantity: item.quantity,
-        };
-    });
-
-    const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        line_items: lineItems,
-        mode: 'payment',
-        success_url: 'http://localhost:3000/success', // Change to your success URL
-        cancel_url: 'http://localhost:3000/cancel',   // Change to your cancel URL
-    });
-
-    res.json({ id: session.id });
+const cjApi = axios.create({
+  baseURL: apiUrl,
+  headers: {
+    'Authorization': `Bearer ${apiKey}`,
+    'Content-Type': 'application/json'
+  }
 });
 
-app.listen(3000, () => console.log('Server running on port 3000'));
+const getProducts = async () => {
+  try {
+    const response = await cjApi.get('https://developers.cjdropshipping.com/api2.0/v1/product/list'); // Replace with actual endpoint
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    throw error;
+  }
+};
+
+const createOrder = async (orderData) => {
+  try {
+    const response = await cjApi.post('https://developers.cjdropshipping.com/api2.0/v1/shopping/order/createOrder', orderData); // Replace with actual endpoint
+    return response.data;
+  } catch (error) {
+    console.error('Error creating order:', error);
+    throw error;
+  }
+};
+
+module.exports = { getProducts, createOrder };

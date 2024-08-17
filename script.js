@@ -214,3 +214,21 @@ form.addEventListener('submit', async function(event) {
         });
     }
 });
+
+
+// CJ orders 
+
+async function createOrder(orderData) {
+    try {
+      const response = await axios.post(`${CJ_BASE_URL}/order/create`, orderData, {
+        headers: {
+          'Client-Id': 'your-client-id',
+          'Client-Secret': 'your-client-secret',
+        },
+      });
+      console.log('Order created:', response.data);
+    } catch (error) {
+      console.error('Error creating order:', error);
+    }
+  }
+  
