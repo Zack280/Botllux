@@ -209,7 +209,7 @@ form.addEventListener('submit', async function(event) {
                 displayError.textContent = paymentIntent.error;
             } else {
                 // Payment was successful, redirect or show a success message
-                window.location.href = 'checkout.html';
+                window.location.href = '/c';
             }
         });
     }
