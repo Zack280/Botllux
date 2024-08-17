@@ -210,6 +210,13 @@ form.addEventListener('submit', async function(event) {
             } else {
                 // Payment was successful, redirect or show a success message
                // window.location.href = 'checkout.html';
+
+                // Wait for 10 seconds (10,000 milliseconds) before executing the action
+setTimeout(() => {
+    // Code to execute after 10 seconds
+    console.log('This code will run after 10 seconds');
+    // Add your desired action here
+}, 10000); // 10,000 milliseconds = 10 seconds
             }
         });
     }
