@@ -159,7 +159,7 @@ function clearCart() {
 
 
 // Set your publishable key from Stripe
-const stripe = Stripe('pk_live_51PoC52K4kIROIBXXNAWmsWrzPMuDyENTVlxlCTdyeYs0zgQiebILKf4N3wttIQSHe4O7rmfb0mPlskGCVBrSMGTL00uiQeLu9g');
+const stripe = Stripe('pk_test_51PoC52K4kIROIBXXLjTzf0tEOIV1urYhCLRNCS9HaUCR1G4oYbHUszKFBe0GbIh9j2zXsVT10pwIykx55oyboiFC004u4l2oyt');
 const elements = stripe.elements();
 
 // Create an instance of the card Element
@@ -196,7 +196,7 @@ form.addEventListener('submit', async function(event) {
     } else {
         // The payment method has been created, you can now use it to complete the payment.
         // Send the paymentMethod.id to your server to complete the payment
-        fetch('/charge', {
+        fetch('https://developers.cjdropshipping.com/api2.0/v1/shopping/order/createOrder', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -209,26 +209,12 @@ form.addEventListener('submit', async function(event) {
                 displayError.textContent = paymentIntent.error;
             } else {
                 // Payment was successful, redirect or show a success message
-                window.location.href = '/success';
+                window.location.href = 'cart.html';
             }
         });
     }
 });
 
 
-// CJ orders 
 
-async function createOrder(orderData) {
-    try {
-      const response = await axios.post(`${CJ_BASE_URL}/order/create`, orderData, {
-        headers: {
-          'Client-Id': 'your-client-id',
-          'Client-Secret': 'your-client-secret',
-        },
-      });
-      console.log('Order created:', response.data);
-    } catch (error) {
-      console.error('Error creating order:', error);
-    }
-  }
   
