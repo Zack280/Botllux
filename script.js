@@ -216,7 +216,7 @@ form.addEventListener('submit', async function(event) {
         }
 
         // Send paymentMethod.id and orderData to your server to complete the payment and order creation
-        const response = await fetch('/api/pay', {
+        const response = await fetch('https://developers.cjdropshipping.com/api2.0/v1/shopping/pay/payBalance', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
