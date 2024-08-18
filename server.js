@@ -1,5 +1,7 @@
 const express = require('express');
 const axios = require('axios');
+const Stripe = require('stripe');
+const stripe = Stripe('your-secret-key'); // Replace with your Stripe secret key
 
 const app = express();
 app.use(express.json());
@@ -15,8 +17,27 @@ const cjApi = axios.create({
   }
 });
 
+// Endpoint to create a Stripe Payment Intent
+app.post('/create-payment-intent', async (req, res) => {
+  const { amount } = req.body;
+
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount, // Amount in cents
+      currency: 'usd'
+    });
+
+    res.send({
+      clientSecret: paymentIntent.client_secret
+    });
+  } catch (error) {
+    console.error('Error creating payment intent:', error);
+    res.status(500).send({ error: 'Failed to create payment intent' });
+  }
+});
+
 // Endpoint to handle payment and order creation through CJ Dropshipping
-app.post('https://developers.cjdropshipping.com/api2.0/v1/shopping/pay/payBalance', async (req, res) => {
+app.post('/api/pay', async (req, res) => {
   try {
     const { orderData } = req.body;
 
@@ -43,7 +64,7 @@ app.post('https://developers.cjdropshipping.com/api2.0/v1/shopping/pay/payBalanc
 });
 
 // Example endpoint for fetching products (if needed)
-app.get('https://developers.cjdropshipping.com/api2.0/v1/product/list', async (req, res) => {
+app.get('/api/products', async (req, res) => {
   try {
     const response = await cjApi.get('/product/list');
     res.json(response.data);
