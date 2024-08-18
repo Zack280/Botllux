@@ -183,67 +183,8 @@ function calculateTotalAmount(cartItems) {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0) * 100;
 }
 
-// Handle form submission
-const form = document.getElementById('payment-form');
-form.addEventListener('submit', async function(event) {
-    event.preventDefault();
 
-    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
 
-    // Prepare order data
-    const orderData = {
-        amount: calculateTotalAmount(cartItems), // Calculate total amount in cents
-        items: cartItems.map(item => ({
-            productId: item.id,
-            quantity: item.quantity,
-            price: item.price
-        })),
-        // Add any additional data required by CJ Dropshipping
-    };
-
-    try {
-        // Create a payment method
-        const {paymentMethod, error} = await stripe.createPaymentMethod({
-            type: 'card',
-            card: card,
-        });
-
-        if (error) {
-            // Display error message to the user
-            const displayError = document.getElementById('card-errors');
-            displayError.textContent = error.message;
-            return;
-        }
-
-        // Send paymentMethod.id and orderData to your server to complete the payment and order creation
-        const response = await fetch('https://developers.cjdropshipping.com/api2.0/v1/shopping/pay/payBalance', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                paymentMethodId: paymentMethod.id,
-                orderData: orderData
-            })
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            // Payment and order creation successful
-            window.location.href = '/success';
-        } else {
-            // Handle payment or order creation failure
-            const displayError = document.getElementById('card-errors');
-            displayError.textContent = result.error || 'Payment failed. Please try again.';
-        }
-
-    } catch (err) {
-        console.error('Error processing payment:', err);
-        const displayError = document.getElementById('card-errors');
-        displayError.textContent = 'An error occurred. Please try again.';
-    }
-});
 
 
 
