@@ -1,7 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const Stripe = require('stripe');
-const stripe = Stripe('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'); // Replace with your Stripe secret key
+const stripe = Stripe('pk_live_51PoC52K4kIROIBXXNAWmsWrzPMuDyENTVlxlCTdyeYs0zgQiebILKf4N3wttIQSHe4O7rmfb0mPlskGCVBrSMGTL00uiQeLu9g'); // Replace with your Stripe secret key
 
 const app = express();
 app.use(express.json());
