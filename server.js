@@ -107,6 +107,7 @@ form.addEventListener('submit', async function(event) {
 
         if (result.success) {
             // Payment and order creation successful
+          console.log('Payment Successful');
             window.location.href = '/success';
         } else {
             // Handle payment or order creation failure
