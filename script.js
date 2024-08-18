@@ -155,51 +155,38 @@ function calculateTotalAmount(cartItems) {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0) * 100;
 }
 
-// Handle form submission for payment
-const form = document.getElementById('payment-form');
-form.addEventListener('submit', async function(event) {
-    event.preventDefault();
-
+document.getElementById('checkout-button').addEventListener('click', async () => {
     const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
 
-    // Prepare order data
-    const orderData = {
-        amount: calculateTotalAmount(cartItems), // Calculate total amount in cents
-        items: cartItems.map(item => ({
-            productId: item.id,
-            quantity: item.quantity,
-            price: item.price
-        })),
-        // Add any additional data required by CJ Dropshipping
-    };
+    if (cartItems.length === 0) {
+        alert('Your cart is empty!');
+        return;
+    }
 
     try {
-        // Send orderData to your server to complete the payment and order creation through CJ Dropshipping
         const response = await fetch('/api/pay', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                orderData: orderData,
-                paymentMethodId: 'your-cj-dropshipping-payment-method-id'
-            })
+            body: JSON.stringify({ orderData: { items: cartItems } })
         });
 
         const result = await response.json();
 
         if (result.success) {
-            // Payment and order creation successful
-            window.location.href = '/success';
+            alert('Payment and order successful!');
+            // Clear the cart
+            clearCart();
+            // Redirect or show a success message
         } else {
-            // Handle payment or order creation failure
-            const displayError = document.getElementById('card-errors');
-            displayError.textContent = result.error || 'Payment failed. Please try again.';
+            alert('Payment failed: ' + result.error);
         }
-
-    } catch (err) {
-        console.error('Error processing payment:', err);
-        const displayError = document.getElementById('card-errors');
-        displayError.textContent = 'An error occurred. Please try again.';
+    } catch (error) {
+        console.error('Error during payment process:', error);
+        alert('There was an error processing your payment.');
     }
 });
+
+
+
