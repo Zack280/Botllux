@@ -22,6 +22,10 @@ app.post('/create-payment-intent', async (req, res) => {
   const { amount } = req.body;
 
   try {
+    if (!amount || amount <= 0) {
+      return res.status(400).send({ error: 'Invalid amount' });
+    }
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount, // Amount in cents
       currency: 'usd'
@@ -37,12 +41,12 @@ app.post('/create-payment-intent', async (req, res) => {
 });
 
 // Endpoint to handle payment and order creation through CJ Dropshipping
-app.post('https://developers.cjdropshipping.com/api2.0/v1/shopping/pay/payBalance', async (req, res) => {
+app.post('/api/pay', async (req, res) => {
   try {
     const { orderData } = req.body;
 
     // Example payment method ID or any specific data required by CJ Dropshipping for the payment
-    const paymentMethodId = 'your-payment-method-id';
+    const paymentMethodId = 'your-payment-method-id'; // Ensure this is replaced with actual payment method ID
 
     // Call CJ Dropshipping API to process payment and create the order
     const response = await cjApi.post('/shopping/pay/payBalance', {
@@ -64,7 +68,7 @@ app.post('https://developers.cjdropshipping.com/api2.0/v1/shopping/pay/payBalanc
 });
 
 // Example endpoint for fetching products (if needed)
-app.get('https://developers.cjdropshipping.com/api2.0/v1/product/list', async (req, res) => {
+app.get('/api/products', async (req, res) => {
   try {
     const response = await cjApi.get('/product/list');
     res.json(response.data);
