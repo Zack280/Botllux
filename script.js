@@ -1,23 +1,18 @@
-
-
-
-
-
 // Add to Cart Buttons
 const addToCartButtons = document.querySelectorAll('.add-to-cart-button');
 addToCartButtons.forEach(button => {
     button.addEventListener('click', (event) => {
         event.preventDefault();
-        
+
         // Get product details from the product card
         const productElement = button.closest('.product-card');
         const productId = productElement.dataset.productId;
         const productName = productElement.querySelector('h3').textContent;
         const productPrice = parseFloat(productElement.querySelector('.price').textContent.replace('$', ''));
         const productQuantity = 1; // Default quantity to 1
-        
+
         // Get the image URL or use a default
-        const imageUrl = productElement.querySelector('img').src || 'https://i.ibb.co/qsTgdW5/Botlluxe.png'; 
+        const imageUrl = productElement.querySelector('img').src || 'https://i.ibb.co/qsTgdW5/Botlluxe.png';
 
         console.log('Adding to cart:', { id: productId, name: productName, price: productPrice, quantity: productQuantity });
 
@@ -30,6 +25,8 @@ addToCartButtons.forEach(button => {
             image: imageUrl
         };
 
+        // Add product to cart
+        addToCart(product);
     });
 });
 
@@ -70,8 +67,6 @@ function addToCart(product) {
     // Load the updated cart to refresh the display
     loadCart();
 }
-
-
 
 // Function to load and display cart items
 function loadCart() {
@@ -142,8 +137,6 @@ function loadCart() {
     });
 }
 
-
-
 // Function to remove an item from the cart
 function removeFromCart(id) {
     let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
@@ -157,35 +150,56 @@ function clearCart() {
     loadCart();  // Reload the cart display (which will now be empty)
 }
 
-
-// Set your publishable key from Stripe
-const stripe = Stripe('pk_live_51PoC52K4kIROIBXXNAWmsWrzPMuDyENTVlxlCTdyeYs0zgQiebILKf4N3wttIQSHe4O7rmfb0mPlskGCVBrSMGTL00uiQeLu9g');
-const elements = stripe.elements();
-
-// Create an instance of the card Element
-const card = elements.create('card');
-
-// Add an instance of the card Element into the `card-element` div
-card.mount('#card-element');
-
-// Handle real-time validation errors from the card Element
-card.addEventListener('change', function(event) {
-    const displayError = document.getElementById('card-errors');
-    if (event.error) {
-        displayError.textContent = event.error.message;
-    } else {
-        displayError.textContent = '';
-    }
-});
-
 // Utility function to calculate the total amount in cents
 function calculateTotalAmount(cartItems) {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0) * 100;
 }
 
+// Handle form submission for payment
+const form = document.getElementById('payment-form');
+form.addEventListener('submit', async function(event) {
+    event.preventDefault();
 
+    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
 
+    // Prepare order data
+    const orderData = {
+        amount: calculateTotalAmount(cartItems), // Calculate total amount in cents
+        items: cartItems.map(item => ({
+            productId: item.id,
+            quantity: item.quantity,
+            price: item.price
+        })),
+        // Add any additional data required by CJ Dropshipping
+    };
 
+    try {
+        // Send orderData to your server to complete the payment and order creation through CJ Dropshipping
+        const response = await fetch('/api/pay', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                orderData: orderData,
+                paymentMethodId: 'your-cj-dropshipping-payment-method-id'
+            })
+        });
 
+        const result = await response.json();
 
-  
+        if (result.success) {
+            // Payment and order creation successful
+            window.location.href = '/success';
+        } else {
+            // Handle payment or order creation failure
+            const displayError = document.getElementById('card-errors');
+            displayError.textContent = result.error || 'Payment failed. Please try again.';
+        }
+
+    } catch (err) {
+        console.error('Error processing payment:', err);
+        const displayError = document.getElementById('card-errors');
+        displayError.textContent = 'An error occurred. Please try again.';
+    }
+});
