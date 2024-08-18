@@ -178,6 +178,11 @@ card.addEventListener('change', function(event) {
     }
 });
 
+// Utility function to calculate the total amount in cents
+function calculateTotalAmount(cartItems) {
+    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0) * 100;
+}
+
 // Handle form submission
 const form = document.getElementById('payment-form');
 form.addEventListener('submit', async function(event) {
