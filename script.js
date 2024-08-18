@@ -183,42 +183,60 @@ const form = document.getElementById('payment-form');
 form.addEventListener('submit', async function(event) {
     event.preventDefault();
 
-    // Create a payment method
-    const {paymentMethod, error} = await stripe.createPaymentMethod({
-        type: 'card',
-        card: card,
-    });
+    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
 
-    if (error) {
-        // Display error.message in your UI.
-        const displayError = document.getElementById('card-errors');
-        displayError.textContent = error.message;
-    } else {
-        // The payment method has been created, you can now use it to complete the payment.
-        // Send the paymentMethod.id to your server to complete the payment
-        fetch('https://developers.cjdropshipping.com/api2.0/v1/shopping/pay/payBalance', {
+    // Prepare order data
+    const orderData = {
+        amount: calculateTotalAmount(cartItems), // Calculate total amount in cents
+        items: cartItems.map(item => ({
+            productId: item.id,
+            quantity: item.quantity,
+            price: item.price
+        })),
+        // Add any additional data required by CJ Dropshipping
+    };
+
+    try {
+        // Create a payment method
+        const {paymentMethod, error} = await stripe.createPaymentMethod({
+            type: 'card',
+            card: card,
+        });
+
+        if (error) {
+            // Display error message to the user
+            const displayError = document.getElementById('card-errors');
+            displayError.textContent = error.message;
+            return;
+        }
+
+        // Send paymentMethod.id and orderData to your server to complete the payment and order creation
+        const response = await fetch('/api/pay', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({paymentMethodId: paymentMethod.id})
-        }).then(function(response) {
-            return response.json();
-        }).then(function(paymentIntent) {
-            if (paymentIntent.error) {
-                displayError.textContent = paymentIntent.error;
-            } else {
-                // Payment was successful, redirect or show a success message
-               // window.location.href = 'checkout.html';
-
-                // Wait for 10 seconds (10,000 milliseconds) before executing the action
-setTimeout(() => {
-    // Code to execute after 10 seconds
-    console.log('This code will run after 10 seconds');
-    // Add your desired action here
-}, 10000); // 10,000 milliseconds = 10 seconds
-            }
+            body: JSON.stringify({
+                paymentMethodId: paymentMethod.id,
+                orderData: orderData
+            })
         });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // Payment and order creation successful
+            window.location.href = '/success';
+        } else {
+            // Handle payment or order creation failure
+            const displayError = document.getElementById('card-errors');
+            displayError.textContent = result.error || 'Payment failed. Please try again.';
+        }
+
+    } catch (err) {
+        console.error('Error processing payment:', err);
+        const displayError = document.getElementById('card-errors');
+        displayError.textContent = 'An error occurred. Please try again.';
     }
 });
 
