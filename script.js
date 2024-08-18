@@ -155,6 +155,24 @@ function calculateTotalAmount(cartItems) {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0) * 100;
 }
 
+// Set your publishable key from Stripe
+const stripe = Stripe('your-publishable-key');
+const elements = stripe.elements();
+
+// Create an instance of the card Element
+const card = elements.create('card');
+card.mount('#card-element');
+
+// Handle real-time validation errors from the card Element
+card.on('change', (event) => {
+    const displayError = document.getElementById('card-errors');
+    if (event.error) {
+        displayError.textContent = event.error.message;
+    } else {
+        displayError.textContent = '';
+    }
+});
+
 document.getElementById('checkout-button').addEventListener('click', async () => {
     const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
 
@@ -163,30 +181,47 @@ document.getElementById('checkout-button').addEventListener('click', async () =>
         return;
     }
 
+    // Create a payment intent on the server
     try {
-        const response = await fetch('/api/pay', {
+        const response = await fetch('/create-payment-intent', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ orderData: { items: cartItems } })
+            body: JSON.stringify({ amount: calculateTotalAmount(cartItems) })
         });
 
-        const result = await response.json();
+        const { clientSecret } = await response.json();
 
-        if (result.success) {
-            alert('Payment and order successful!');
+        const result = await stripe.confirmCardPayment(clientSecret, {
+            payment_method: {
+                card: card,
+                billing_details: {
+                    name: 'Customer Name' // Replace with customer's name
+                }
+            }
+        });
+
+        if (result.error) {
+            alert(`Payment failed: ${result.error.message}`);
+        } else if (result.paymentIntent.status === 'succeeded') {
+            alert('Payment successful!');
+
+            // Send the order to your server to handle CJ Dropshipping
+            await fetch('/api/pay', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ orderData: { items: cartItems } })
+            });
+
             // Clear the cart
             clearCart();
             // Redirect or show a success message
-        } else {
-            alert('Payment failed: ' + result.error);
         }
     } catch (error) {
         console.error('Error during payment process:', error);
         alert('There was an error processing your payment.');
     }
 });
-
-
-
