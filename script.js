@@ -110,7 +110,7 @@ function loadCart() {
                 <p class="item-price">$${item.price.toFixed(2)}</p>
                 <p class="item-quantity">Quantity: ${item.quantity}</p>
                 <div class="item-actions">
-                    <button class="remove-button" data-id="${item.id}" onclick="removeFromCart(${item.id});">Remove</button>
+                    <button class="remove-button" data-id="${item.id}" onclick="removeFromCart('${item.id}');">Remove</button>
                 </div>
             </div>
         `;
@@ -150,78 +150,69 @@ function clearCart() {
     loadCart();  // Reload the cart display (which will now be empty)
 }
 
-// Utility function to calculate the total amount in cents
+// Function to calculate the total amount in USD
 function calculateTotalAmount(cartItems) {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0) * 100;
+    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 }
 
-// Set your publishable key from Stripe
-const stripe = Stripe('your-publishable-key');
-const elements = stripe.elements();
+// PayPal integration
+paypal.Buttons({
+    createOrder: function(data, actions) {
+        // Calculate the total amount and create an order
+        const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+        const totalAmount = calculateTotalAmount(cartItems);
 
-// Create an instance of the card Element
-const card = elements.create('card');
-card.mount('#card-element');
-
-// Handle real-time validation errors from the card Element
-card.on('change', (event) => {
-    const displayError = document.getElementById('card-errors');
-    if (event.error) {
-        displayError.textContent = event.error.message;
-    } else {
-        displayError.textContent = '';
-    }
-});
-
-document.getElementById('checkout-button').addEventListener('click', async () => {
-    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-
-    if (cartItems.length === 0) {
-        alert('Your cart is empty!');
-        return;
-    }
-
-    // Create a payment intent on the server
-    try {
-        const response = await fetch('/create-payment-intent', {
+        return fetch('/create-paypal-order', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ amount: calculateTotalAmount(cartItems) })
-        });
-
-        const { clientSecret } = await response.json();
-
-        const result = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: {
-                card: card,
-                billing_details: {
-                    name: 'Customer Name' // Replace with customer's name
-                }
-            }
-        });
-
-        if (result.error) {
-            alert(`Payment failed: ${result.error.message}`);
-        } else if (result.paymentIntent.status === 'succeeded') {
-            alert('Payment successful!');
-
-            // Send the order to your server to handle CJ Dropshipping
-            await fetch('/api/pay', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ orderData: { items: cartItems } })
+            body: JSON.stringify({ amount: totalAmount })
+        })
+        .then(res => res.json())
+        .then(orderData => {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: totalAmount.toFixed(2) // Amount in USD
+                    }
+                }]
             });
+        });
+    },
+    onApprove: function(data, actions) {
+        return fetch('/capture-paypal-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ orderId: data.orderID })
+        })
+        .then(res => res.json())
+        .then(orderData => {
+            if (orderData.status === 'COMPLETED') {
+                alert('Payment successful!');
 
+                // Send the order to your server to handle CJ Dropshipping
+                return fetch('/api/pay', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ orderData: { items: JSON.parse(localStorage.getItem('cartItems')) } })
+                });
+            } else {
+                alert('Payment failed!');
+            }
+        })
+        .then(() => {
             // Clear the cart
             clearCart();
             // Redirect or show a success message
-        }
-    } catch (error) {
-        console.error('Error during payment process:', error);
-        alert('There was an error processing your payment.');
+        })
+        .catch(error => {
+            console.error('Error during PayPal transaction:', error);
+            alert('There was an error processing your payment.');
+        });
     }
-});
+}).render('#paypal-button-container');
