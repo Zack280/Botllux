@@ -11,8 +11,8 @@ const apiKey = '33b93f0cf2c04545b812cd9a840f88ce';
 const apiUrl = 'https://developers.cjdropshipping.com/api2.0/v1';
 
 // PayPal configuration
-const clientId = 'YOUR_PAYPAL_CLIENT_ID'; // Replace with your PayPal client ID
-const clientSecret = 'YOUR_PAYPAL_CLIENT_SECRET'; // Replace with your PayPal client secret
+const clientId = 'AZ7poj2HOeKuQDtY19tPB5sK6v07_4w3M7BZbOcj172BgpEEruFlMRSNythoreHpOlZptiGRzQfb4Uzi'; // Replace with your PayPal client ID
+const clientSecret = 'ENq_yNAF_KcrNlsvaSZuU_3V9QLf8plkMzFBo0-F1ACqkXXCwEonBT9kcqyT48ZfsXysq1hLX1f8KF1Q'; // Replace with your PayPal client secret
 
 // Create a PayPal environment
 const environment = new paypal.core.SandboxEnvironment(clientId, clientSecret);
