@@ -16,9 +16,12 @@ const cjApi = axios.create({
 });
 
 // Endpoint to handle payment and order creation through CJ Dropshipping
-app.post('/api/pay', async (req, res) => {
+app.post('https://developers.cjdropshipping.com/api2.0/v1/shopping/pay/payBalance', async (req, res) => {
   try {
-    const { orderData, paymentMethodId } = req.body;
+    const { orderData } = req.body;
+
+    // Example payment method ID or any specific data required by CJ Dropshipping for the payment
+    const paymentMethodId = 'your-payment-method-id';
 
     // Call CJ Dropshipping API to process payment and create the order
     const response = await cjApi.post('/shopping/pay/payBalance', {
@@ -40,7 +43,7 @@ app.post('/api/pay', async (req, res) => {
 });
 
 // Example endpoint for fetching products (if needed)
-app.get('/api/products', async (req, res) => {
+app.get('https://developers.cjdropshipping.com/api2.0/v1/product/list', async (req, res) => {
   try {
     const response = await cjApi.get('/product/list');
     res.json(response.data);
