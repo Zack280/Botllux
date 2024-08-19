@@ -1,6 +1,6 @@
 // server.js
 const express = require('express');
-const paypal = require('@paypal/checkout-server-sdk');
+const paypal = require('https://api-m.sandbox.paypal.com');
 
 const app = express();
 app.use(express.json());
