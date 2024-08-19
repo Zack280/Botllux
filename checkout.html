@@ -17,49 +17,63 @@
 </html>
 
 <script>
-    paypal.Buttons({
-      createOrder: function(data, actions) {
-        return fetch('https://api-m.paypal.com/v2/checkout/orders', {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json'
-          },
-          body: JSON.stringify({
-            amount: '10.00' // Replace with the actual amount
-          })
+  paypal.Buttons({
+    createOrder: function(data, actions) {
+      return fetch('https://api-m.sandbox.paypal.com/v2/checkout/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer YOUR_ACCESS_TOKEN' // You might need to dynamically obtain and include the access token
+        },
+        body: JSON.stringify({
+          intent: 'CAPTURE',
+          purchase_units: [{
+            amount: {
+              currency_code: 'USD',
+              value: '10.00' // Replace with the actual amount
+            }
+          }]
         })
-        .then(res => res.json())
-        .then(orderData => {
-          return actions.order.create({
-            purchase_units: [{
-              amount: {
-                value: '10.00' // Replace with the actual amount
-              }
-            }],
-            id: orderData.id
-          });
+      })
+      .then(res => res.json())
+      .then(orderData => {
+        if (!orderData.id) {
+          throw new Error('Order ID not returned from server');
+        }
+        return actions.order.create({
+          purchase_units: [{
+            amount: {
+              value: '10.00' // Replace with the actual amount
+            }
+          }],
+          id: orderData.id
         });
-      },
-      onApprove: function(data, actions) {
-        return fetch('https://api-m.paypal.com/v2/checkout/orders/${id}/capture', {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json'
-          },
-          body: JSON.stringify({
-            orderId: data.orderID
-          })
-        })
-        .then(res => res.json())
-        .then(orderData => {
-          if (orderData.status === 'COMPLETED') {
-            alert('Payment successful!');
-            // Handle successful payment
-          } else {
-            alert('Payment failed!');
-          }
-        });
-      }
-    }).render('#paypal-button-container');
-  </script>
+      });
+    },
+    onApprove: function(data, actions) {
+      return fetch(`https://api-m.sandbox.paypal.com/v2/checkout/orders/${data.orderID}/capture`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer YOUR_ACCESS_TOKEN' // You might need to dynamically obtain and include the access token
+        },
+        body: JSON.stringify({})
+      })
+      .then(res => res.json())
+      .then(orderData => {
+        if (orderData.status === 'COMPLETED') {
+          alert('Payment successful!');
+          // Handle successful payment
+        } else {
+          alert('Payment failed!');
+        }
+      })
+      .catch(error => {
+        console.error('Error during capture:', error);
+        alert('Payment failed!');
+      });
+    }
+  }).render('#paypal-button-container');
+</script>
+
 
