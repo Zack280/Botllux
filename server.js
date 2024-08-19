@@ -59,11 +59,11 @@ app.post('https://api-m.paypal.com/v2/checkout/orders', async (req, res) => {
 });
 
 // Capture PayPal order
-app.post('https://api-m.paypal.com/v2/checkout/orders/${orderId}/capture', async (req, res) => {
+app.post('https://api-m.paypal.com/v2/checkout/orders/${id}/capture', async (req, res) => {
     const accessToken = await getAccessToken();
     const orderId = req.body.orderId;
 
-    const response = await fetch(`${baseURL}/v2/checkout/orders/${orderId}/capture`, {
+    const response = await fetch(`${baseURL}/v2/checkout/orders/${id}/capture`, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${accessToken}`,
