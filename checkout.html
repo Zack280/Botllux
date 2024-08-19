@@ -16,50 +16,5 @@
 </body>
 </html>
 
-<script>
-  paypal.Buttons({
-    createOrder: function(data, actions) {
-      return fetch('/create-paypal-order', {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json'
-        },
-        body: JSON.stringify({
-          amount: '10.00' // Replace with the actual amount
-        })
-      })
-      .then(res => res.json())
-      .then(orderData => {
-        return actions.order.create({
-          purchase_units: [{
-            amount: {
-              value: '10.00' // Replace with the actual amount
-            }
-          }],
-          id: orderData.id
-        });
-      });
-    },
-    onApprove: function(data, actions) {
-      return fetch('/capture-paypal-order', {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json'
-        },
-        body: JSON.stringify({
-          orderId: data.orderID
-        })
-      })
-      .then(res => res.json())
-      .then(orderData => {
-        if (orderData.status === 'COMPLETED') {
-          alert('Payment successful!');
-          // Handle successful payment
-        } else {
-          alert('Payment failed!');
-        }
-      });
-    }
-  }).render('#paypal-button-container');
-</script>
+
 
