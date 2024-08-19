@@ -19,7 +19,7 @@
 <script>
   paypal.Buttons({
     createOrder: function(data, actions) {
-      return fetch('/create-paypal-order', {
+      return fetch('https://api-m.sandbox.paypal.com/v2/checkout/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -41,7 +41,7 @@
       });
     },
     onApprove: function(data, actions) {
-      return fetch('/capture-paypal-order', {
+      return fetch(`https://api-m.sandbox.paypal.com/v2/checkout/orders/${data.orderID}/capture`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
