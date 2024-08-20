@@ -5,7 +5,20 @@ const app = express();
 app.use(express.json());
 
 // PayPal configuration
-const accessToken = '6V7rbVwmlM1gFZKW_8QtzWXqpcwQ6T5vhEGYNJDAAdn3paCgRpdeMdVYmWzgbKSsECednupJ3Zx5Xd-g'; // Replace with your actual access token
+// Helper function to get access token
+async function getAccessToken() {
+    const response = await fetch(`${baseURL}/v1/oauth2/token`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'grant_type=client_credentials'
+    });
+
+    const data = await response.json();
+    return data.access_token;
+}
 
 // Create PayPal order
 app.post('/create-paypal-order', async (req, res) => {
