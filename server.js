@@ -7,7 +7,7 @@ app.use(express.json());
 
 const clientId = 'AZ7poj2HOeKuQDtY19tPB5sK6v07_4w3M7BZbOcj172BgpEEruFlMRSNythoreHpOlZptiGRzQfb4Uzi';
 const clientSecret = 'ENq_yNAF_KcrNlsvaSZuU_3V9QLf8plkMzFBo0-F1ACqkXXCwEonBT9kcqyT48ZfsXysq1hLX1f8KF1Q';
-const baseURL = 'https://api-m.sandbox.paypal.com';
+const baseURL = 'https://api-m.sandbox.paypal.com'; // Use sandbox for testing
 
 let cachedToken = null;
 let tokenExpiry = null;
@@ -33,11 +33,11 @@ async function getAccessToken() {
     }
 
     cachedToken = data.access_token;
-    tokenExpiry = Date.now() + data.expires_in * 1000;
+    tokenExpiry = Date.now() + data.expires_in * 1000; // Convert expires_in to milliseconds
     return cachedToken;
 }
 
-app.post('/v2/checkout/orders', async (req, res) => {
+app.post('/create-order', async (req, res) => {
     try {
         const accessToken = await getAccessToken();
         const response = await fetch(`${baseURL}/v2/checkout/orders`, {
@@ -54,21 +54,7 @@ app.post('/v2/checkout/orders', async (req, res) => {
                         "currency_code": "USD",
                         "value": req.body.amount
                     }
-                }],
-                "payment_source": {
-                    "paypal": {
-                        "experience_context": {
-                            "payment_method_preference": "IMMEDIATE_PAYMENT_REQUIRED",
-                            "brand_name": "Your Brand",
-                            "locale": "en-US",
-                            "landing_page": "LOGIN",
-                            "shipping_preference": "SET_PROVIDED_ADDRESS",
-                            "user_action": "PAY_NOW",
-                            "return_url": "https://example.com/returnUrl",
-                            "cancel_url": "https://example.com/cancelUrl"
-                        }
-                    }
-                }
+                }]
             })
         });
         const orderData = await response.json();
@@ -79,7 +65,7 @@ app.post('/v2/checkout/orders', async (req, res) => {
     }
 });
 
-app.post('/v2/checkout/orders/:id/capture', async (req, res) => {
+app.post('/capture-order', async (req, res) => {
     const { orderId } = req.body;
 
     if (!orderId) {
