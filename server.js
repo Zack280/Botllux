@@ -1,5 +1,6 @@
 const express = require('express');
 const fetch = require('node-fetch');
+const axios = require('axios');
 const btoa = require('btoa');
 
 const app = express();
@@ -8,6 +9,9 @@ app.use(express.json());
 const clientId = 'AZ7poj2HOeKuQDtY19tPB5sK6v07_4w3M7BZbOcj172BgpEEruFlMRSNythoreHpOlZptiGRzQfb4Uzi';
 const clientSecret = 'ENq_yNAF_KcrNlsvaSZuU_3V9QLf8plkMzFBo0-F1ACqkXXCwEonBT9kcqyT48ZfsXysq1hLX1f8KF1Q';
 const baseURL = 'https://api-m.sandbox.paypal.com'; // Use sandbox for testing
+
+const cjApiKey = 'YOUR_CJ_DROPSHIPPING_API_KEY'; // Replace with your CJ Dropshipping API Key
+const cjApiBaseURL = 'https://developers.cjdropshipping.com/';
 
 let cachedToken = null;
 let tokenExpiry = null;
@@ -66,7 +70,7 @@ app.post('/create-order', async (req, res) => {
 });
 
 app.post('/capture-order', async (req, res) => {
-    const { orderId } = req.body;
+    const { orderId, productId, quantity, shippingInfo } = req.body;
 
     if (!orderId) {
         return res.status(400).send('Order ID is required');
@@ -82,7 +86,37 @@ app.post('/capture-order', async (req, res) => {
             }
         });
         const captureData = await response.json();
-        res.json({ status: captureData.status });
+
+        if (captureData.status !== 'COMPLETED') {
+            return res.status(400).send('Payment not completed');
+        }
+
+        // Create CJ Dropshipping Order
+        const cjOrderResponse = await axios.post(
+            `${cjApiBaseURL}/api/order/addOrder`,
+            {
+                orderId: orderId,
+                productList: [
+                    {
+                        productId: productId,
+                        quantity: quantity
+                    }
+                ],
+                shippingInfo: shippingInfo
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${cjApiKey}`
+                }
+            }
+        );
+
+        if (cjOrderResponse.data.success) {
+            res.json({ message: 'CJ Dropshipping order created successfully!', orderId: cjOrderResponse.data.orderId });
+        } else {
+            res.status(500).json({ message: 'Failed to create CJ Dropshipping order', details: cjOrderResponse.data });
+        }
     } catch (error) {
         console.error(error);
         res.status(500).send('Error capturing PayPal order');
