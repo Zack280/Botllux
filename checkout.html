@@ -15,7 +15,7 @@
     <script>
         paypal.Buttons({
             createOrder: function(data, actions) {
-                return fetch('https://api-m.paypal.com/v2/checkout/orders', {
+                return fetch('/create-order', { // Make request to your server
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -26,18 +26,17 @@
                 })
                 .then(res => res.json())
                 .then(orderData => {
-                    return orderData.id; // Return the order ID
+                    return orderData.id; // Return the PayPal order ID received from your server
                 });
             },
             onApprove: function(data, actions) {
-                // Use the orderID provided by PayPal's data object
-                return fetch(`/v2/checkout/orders/${data.orderID}/capture`, {
+                return fetch(`/capture-order`, { // Make request to your server
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        orderId: data.orderID // Pass the order ID here
+                        orderId: data.orderID // Pass the order ID to your server
                     })
                 })
                 .then(res => res.json())
