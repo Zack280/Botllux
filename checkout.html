@@ -14,7 +14,7 @@
     <script src="https://www.paypal.com/sdk/js?client-id=AZ7poj2HOeKuQDtY19tPB5sK6v07_4w3M7BZbOcj172BgpEEruFlMRSNythoreHpOlZptiGRzQfb4Uzi"></script>
     <script>
       async function getAccessToken() {
-        const res = await fetch('/paypal-token');
+        const res = await fetch('https://api-m.sandbox.paypal.com/v1/oauth2/token');
         const data = await res.json();
         return data.access_token;
       }
