@@ -11,46 +11,44 @@
         <h1>Payment</h1>
         <div id="paypal-button-container"></div>
     </div>
-    <script src="https://www.paypal.com/sdk/js?client-id=AZ7poj2HOeKuQDtY19tPB5sK6v07_4w3M7BZbOcj172BgpEEruFlMRSNythoreHpOlZptiGRzQfb4Uzi"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AZ7poj2HOeKuQDtY19tPB5sK6v07_4w3M7BZbOcj172BgpEEruFlMRSNythoreHpOlZptiGRzQfb4Uzi&currency=USD"></script>
     <script>
-  
-     paypal.Buttons({
-    createOrder: function(data, actions) {
-        return fetch('https://api-m.sandbox.paypal.com/v2/checkout/orders', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
+        paypal.Buttons({
+            createOrder: function(data, actions) {
+                return fetch('/v2/checkout/orders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        amount: '10.00' // Replace with the actual amount
+                    })
+                })
+                .then(res => res.json())
+                .then(orderData => {
+                    return orderData.id;
+                });
             },
-            body: JSON.stringify({
-                amount: '10.00' // Replace with the actual amount
-            })
-        })
-        .then(res => res.json())
-        .then(orderData => {
-            return orderData.id;
-        });
-    },
-    onApprove: function(data, actions) {
-        return fetch('https://api-m.paypal.com/v2/checkout/orders/{id}/capture', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                orderId: orderData.id
-            })
-        })
-        .then(res => res.json())
-        .then(orderData => {
-            if (orderData.status === 'COMPLETED') {
-                alert('Payment successful!');
-            } else {
-                alert('Payment failed!');
+            onApprove: function(data, actions) {
+                return fetch(`/v2/checkout/orders/${data.orderID}/capture`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        orderId: data.orderID
+                    })
+                })
+                .then(res => res.json())
+                .then(captureData => {
+                    if (captureData.status === 'COMPLETED') {
+                        alert('Payment successful!');
+                    } else {
+                        alert('Payment failed!');
+                    }
+                });
             }
-        });
-    }
-}).render('#paypal-button-container');
-
+        }).render('#paypal-button-container');
     </script>
 </body>
 </html>
