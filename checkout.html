@@ -13,58 +13,43 @@
     </div>
     <script src="https://www.paypal.com/sdk/js?client-id=AZ7poj2HOeKuQDtY19tPB5sK6v07_4w3M7BZbOcj172BgpEEruFlMRSNythoreHpOlZptiGRzQfb4Uzi"></script>
     <script>
-      async function getAccessToken() {
-        const res = await fetch('https://api-m.sandbox.paypal.com/v1/oauth2/token');
-        const data = await res.json();
-        return data.access_token;
-      }
-
-      paypal.Buttons({
-        createOrder: async function(data, actions) {
-          const accessToken = await getAccessToken();
-
-          return fetch('https://api-m.sandbox.paypal.com/v2/checkout/orders', {
+     paypal.Buttons({
+    createOrder: function(data, actions) {
+        return fetch('/create-paypal-order', {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${accessToken}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              intent: 'CAPTURE',
-              purchase_units: [{
-                amount: {
-                  currency_code: 'USD',
-                  value: '10.00' // Replace with the actual amount
-                }
-              }]
+                amount: '10.00' // Replace with the actual amount
             })
-          })
-          .then(res => res.json())
-          .then(orderData => {
-            return orderData.id; // Return the order ID to PayPal
-          });
-        },
-        onApprove: async function(data, actions) {
-          const accessToken = await getAccessToken();
-
-          return fetch(`https://api-m.sandbox.paypal.com/v2/checkout/orders/${data.orderID}/capture`, {
+        })
+        .then(res => res.json())
+        .then(orderData => {
+            return orderData.id;
+        });
+    },
+    onApprove: function(data, actions) {
+        return fetch('/capture-paypal-order', {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${accessToken}`
-            }
-          })
-          .then(res => res.json())
-          .then(orderData => {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                orderId: data.orderID
+            })
+        })
+        .then(res => res.json())
+        .then(orderData => {
             if (orderData.status === 'COMPLETED') {
-              alert('Payment successful!');
-              // Handle successful payment
+                alert('Payment successful!');
             } else {
-              alert('Payment failed!');
+                alert('Payment failed!');
             }
-          });
-        }
-      }).render('#paypal-button-container');
+        });
+    }
+}).render('#paypal-button-container');
+
     </script>
 </body>
 </html>
