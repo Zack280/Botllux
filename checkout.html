@@ -30,7 +30,7 @@
         });
     },
     onApprove: function(data, actions) {
-        return fetch('/capture-paypal-order', {
+        return fetch('https://api-m.paypal.com/v2/checkout/orders/{id}/capture', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
