@@ -155,3 +155,27 @@ function calculateTotalAmount(cartItems) {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 }
 
+  async function getAccessToken() {
+    if (cachedToken && tokenExpiry > Date.now()) {
+        return cachedToken;
+    }
+
+    const auth = btoa(`${clientId}:${clientSecret}`);
+    const response = await fetch(`${baseURL}/v1/oauth2/token`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Basic ${auth}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'grant_type=client_credentials'
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error('Failed to retrieve PayPal token');
+    }
+
+    cachedToken = data.access_token;
+    tokenExpiry = Date.now() + data.expires_in * 1000; // Convert expires_in to milliseconds
+    return cachedToken;
+}
