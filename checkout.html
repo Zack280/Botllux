@@ -16,7 +16,7 @@
         paypal.Buttons({
             createOrder: function(data, actions) {
                 // Create order on the server
-                return fetch('/create-order', {
+                return fetch('https://api-m.paypal.com/v2/checkout/orders', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
