@@ -1,5 +1,6 @@
 const express = require('express');
 const fetch = require('node-fetch');
+const btoa = require('btoa');
 
 const app = express();
 app.use(express.json());
@@ -8,12 +9,11 @@ app.use(express.json());
 const clientId = 'AZ7poj2HOeKuQDtY19tPB5sK6v07_4w3M7BZbOcj172BgpEEruFlMRSNythoreHpOlZptiGRzQfb4Uzi'; // Replace with your PayPal client ID
 const clientSecret = 'ENq_yNAF_KcrNlsvaSZuU_3V9QLf8plkMzFBo0-F1ACqkXXCwEonBT9kcqyT48ZfsXysq1hLX1f8KF1Q'; // Replace with your PayPal client secret
 const baseURL = 'https://api-m.sandbox.paypal.com'; // Use 'https://api-m.paypal.com' for live environment
-// PayPal configuration
 
 // Endpoint to get PayPal access token
-app.get('https://api-m.sandbox.paypal.com/v1/oauth2/token', async (req, res) => {
+app.get('/paypal-token', async (req, res) => {
     const auth = btoa(`${clientId}:${clientSecret}`);
-    const response = await fetch('https://api-m.sandbox.paypal.com/v1/oauth2/token', {
+    const response = await fetch(`${baseURL}/v1/oauth2/token`, {
         method: 'POST',
         headers: {
             'Authorization': `Basic ${auth}`,
@@ -23,7 +23,11 @@ app.get('https://api-m.sandbox.paypal.com/v1/oauth2/token', async (req, res) => 
     });
 
     const data = await response.json();
-    res.json({ access_token: data.access_token });
+    if (response.ok) {
+        res.json({ access_token: data.access_token });
+    } else {
+        res.status(500).json({ error: 'Failed to retrieve PayPal token' });
+    }
 });
 
 // Helper function to get access token
@@ -31,20 +35,24 @@ async function getAccessToken() {
     const response = await fetch(`${baseURL}/v1/oauth2/token`, {
         method: 'POST',
         headers: {
-            'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
+            'Authorization': `Basic ${btoa(`${clientId}:${clientSecret}`)}`,
             'Content-Type': 'application/x-www-form-urlencoded'
         },
         body: 'grant_type=client_credentials'
     });
 
     const data = await response.json();
+    if (!response.ok) {
+        throw new Error('Failed to retrieve PayPal token');
+    }
     return data.access_token;
 }
 
 // Create PayPal order
 app.post('/create-paypal-order', async (req, res) => {
     try {
-        const response = await fetch('https://api-m.sandbox.paypal.com/v2/checkout/orders', {
+        const accessToken = await getAccessToken(); // Ensure the token is retrieved before making the request
+        const response = await fetch(`${baseURL}/v2/checkout/orders`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -93,7 +101,8 @@ app.post('/capture-paypal-order', async (req, res) => {
     }
 
     try {
-        const response = await fetch(`https://api-m.sandbox.paypal.com/v2/checkout/orders/${orderId}/capture`, {
+        const accessToken = await getAccessToken(); // Ensure the token is retrieved before making the request
+        const response = await fetch(`${baseURL}/v2/checkout/orders/${orderId}/capture`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
