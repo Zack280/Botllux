@@ -20,8 +20,6 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
-                'Authorization': `Bearer ${accessToken}` // Use the access token variable
-
             },
             body: JSON.stringify({
                 amount: '10.00' // Replace with the actual amount
@@ -37,8 +35,6 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
-                'Authorization': `Bearer ${accessToken}` // Use the access token variable
-
             },
             body: JSON.stringify({
                 orderId: orderData.id
