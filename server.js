@@ -11,7 +11,7 @@ const baseURL = 'https://api-m.sandbox.paypal.com'; // Use 'https://api-m.paypal
 // PayPal configuration
 
 // Endpoint to get PayPal access token
-app.get('/paypal-token', async (req, res) => {
+app.get('https://api-m.sandbox.paypal.com/v1/oauth2/token', async (req, res) => {
     const auth = btoa(`${clientId}:${clientSecret}`);
     const response = await fetch('https://api-m.sandbox.paypal.com/v1/oauth2/token', {
         method: 'POST',
