@@ -10,7 +10,7 @@ const clientId = 'AZ7poj2HOeKuQDtY19tPB5sK6v07_4w3M7BZbOcj172BgpEEruFlMRSNythore
 const clientSecret = 'ENq_yNAF_KcrNlsvaSZuU_3V9QLf8plkMzFBo0-F1ACqkXXCwEonBT9kcqyT48ZfsXysq1hLX1f8KF1Q';
 const baseURL = 'https://api-m.sandbox.paypal.com'; // Use sandbox for testing
 
-const cjApiKey = 'YOUR_CJ_DROPSHIPPING_API_KEY'; // Replace with your CJ Dropshipping API Key
+const cjApiKey = '33b93f0cf2c04545b812cd9a840f88ce'; // Replace with your CJ Dropshipping API Key
 const cjApiBaseURL = 'https://developers.cjdropshipping.com/';
 
 let cachedToken = null;
