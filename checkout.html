@@ -15,7 +15,7 @@
     <script>
         paypal.Buttons({
             createOrder: function(data, actions) {
-                return fetch('/create-order', { // Make request to your server
+                return fetch('https://api-m.paypal.com/v2/checkout/orders', { // Make request to your server
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -30,7 +30,7 @@
                 });
             },
             onApprove: function(data, actions) {
-                return fetch(`/capture-order`, { // Make request to your server
+                return fetch(`https://api-m.paypal.com/v2/checkout/orders/{id}/capture`, { // Make request to your server
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
