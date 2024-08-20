@@ -15,11 +15,10 @@
     <script>
         paypal.Buttons({
             createOrder: function(data, actions) {
-                return fetch('https://api-m.paypal.com/v2/checkout/orders', {
+                return fetch('/v2/checkout/orders', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer 6V7rbVwmlM1gFZKW_8QtzWXqpcwQ6T5vhEGYNJDAAdn3paCgRpdeMdVYmWzgbKSsECednupJ3Zx5Xd-g'
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         amount: '10.00' // Replace with the actual amount
@@ -27,17 +26,18 @@
                 })
                 .then(res => res.json())
                 .then(orderData => {
-                    return orderData.id;
+                    return orderData.id; // Return the order ID
                 });
             },
             onApprove: function(data, actions) {
-                return fetch(`https://api-m.paypal.com/v2/checkout/orders/${data.orderID}/capture`, {
+                // Use the orderID provided by PayPal's data object
+                return fetch(`/v2/checkout/orders/${data.orderID}/capture`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        orderId: data.orderID
+                        orderId: data.orderID // Pass the order ID here
                     })
                 })
                 .then(res => res.json())
