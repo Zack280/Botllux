@@ -13,15 +13,30 @@
     </div>
     <script src="https://www.paypal.com/sdk/js?client-id=AZ7poj2HOeKuQDtY19tPB5sK6v07_4w3M7BZbOcj172BgpEEruFlMRSNythoreHpOlZptiGRzQfb4Uzi"></script>
     <script>
+      async function getAccessToken() {
+        const res = await fetch('/paypal-token');
+        const data = await res.json();
+        return data.access_token;
+      }
+
       paypal.Buttons({
-        createOrder: function(data, actions) {
-          return fetch('https://api-m.paypal.com/v2/checkout/orders', {
+        createOrder: async function(data, actions) {
+          const accessToken = await getAccessToken();
+
+          return fetch('https://api-m.sandbox.paypal.com/v2/checkout/orders', {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`
             },
             body: JSON.stringify({
-              amount: '10.00' // Replace with the actual amount
+              intent: 'CAPTURE',
+              purchase_units: [{
+                amount: {
+                  currency_code: 'USD',
+                  value: '10.00' // Replace with the actual amount
+                }
+              }]
             })
           })
           .then(res => res.json())
@@ -29,15 +44,15 @@
             return orderData.id; // Return the order ID to PayPal
           });
         },
-        onApprove: function(data, actions) {
-          return fetch('https://api-m.paypal.com/v2/checkout/orders/${orderId}/capture', {
+        onApprove: async function(data, actions) {
+          const accessToken = await getAccessToken();
+
+          return fetch(`https://api-m.sandbox.paypal.com/v2/checkout/orders/${data.orderID}/capture`, {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              orderId: data.orderID
-            })
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`
+            }
           })
           .then(res => res.json())
           .then(orderData => {
