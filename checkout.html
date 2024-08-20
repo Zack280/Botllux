@@ -13,32 +13,7 @@
     </div>
     <script src="https://www.paypal.com/sdk/js?client-id=AZ7poj2HOeKuQDtY19tPB5sK6v07_4w3M7BZbOcj172BgpEEruFlMRSNythoreHpOlZptiGRzQfb4Uzi"></script>
     <script>
-
-        async function getAccessToken() {
-    if (cachedToken && tokenExpiry > Date.now()) {
-        return cachedToken;
-    }
-
-    const auth = btoa(`${clientId}:${clientSecret}`);
-    const response = await fetch(`${baseURL}/v1/oauth2/token`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Basic ${auth}`,
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: 'grant_type=client_credentials'
-    });
-
-    const data = await response.json();
-    if (!response.ok) {
-        throw new Error('Failed to retrieve PayPal token');
-    }
-
-    cachedToken = data.access_token;
-    tokenExpiry = Date.now() + data.expires_in * 1000; // Convert expires_in to milliseconds
-    return cachedToken;
-}
-        
+  
      paypal.Buttons({
     createOrder: function(data, actions) {
         return fetch('https://api-m.sandbox.paypal.com/v2/checkout/orders', {
