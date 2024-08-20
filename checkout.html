@@ -15,7 +15,7 @@
     <script>
      paypal.Buttons({
     createOrder: function(data, actions) {
-        return fetch('/create-paypal-order', {
+        return fetch('https://api-m.sandbox.paypal.com/v2/checkout/orders', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
