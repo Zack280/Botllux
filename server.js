@@ -5,8 +5,8 @@ const btoa = require('btoa');
 const app = express();
 app.use(express.json());
 
-const clientId = 'AZ7poj2HOeKuQDtY19tPB5sK6v07_4w3M7BZbOcj172BgpEEruFlMRSNythoreHpOlZptiGRzQfb4Uzi'; // Replace with your PayPal client ID
-const clientSecret = 'ENq_yNAF_KcrNlsvaSZuU_3V9QLf8plkMzFBo0-F1ACqkXXCwEonBT9kcqyT48ZfsXysq1hLX1f8KF1Q'; // Replace with your PayPal client secret
+const clientId = 'AZ7poj2HOeKuQDtY19tPB5sK6v07_4w3M7BZbOcj172BgpEEruFlMRSNythoreHpOlZptiGRzQfb4Uzi';
+const clientSecret = 'ENq_yNAF_KcrNlsvaSZuU_3V9QLf8plkMzFBo0-F1ACqkXXCwEonBT9kcqyT48ZfsXysq1hLX1f8KF1Q';
 const baseURL = 'https://api-m.sandbox.paypal.com';
 
 let cachedToken = null;
@@ -33,11 +33,11 @@ async function getAccessToken() {
     }
 
     cachedToken = data.access_token;
-    tokenExpiry = Date.now() + data.expires_in * 1000; // Convert expires_in to milliseconds
+    tokenExpiry = Date.now() + data.expires_in * 1000;
     return cachedToken;
 }
 
-app.post('https://api-m.paypal.com/v2/checkout/orders', async (req, res) => {
+app.post('/v2/checkout/orders', async (req, res) => {
     try {
         const accessToken = await getAccessToken();
         const response = await fetch(`${baseURL}/v2/checkout/orders`, {
@@ -79,7 +79,7 @@ app.post('https://api-m.paypal.com/v2/checkout/orders', async (req, res) => {
     }
 });
 
-app.post('https://api-m.paypal.com/v2/checkout/orders/{id}/capture', async (req, res) => {
+app.post('/v2/checkout/orders/:id/capture', async (req, res) => {
     const { orderId } = req.body;
 
     if (!orderId) {
