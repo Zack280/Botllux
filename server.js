@@ -4,7 +4,28 @@ const fetch = require('node-fetch');
 const app = express();
 app.use(express.json());
 
+// PayPal credentials
+const clientId = 'AZ7poj2HOeKuQDtY19tPB5sK6v07_4w3M7BZbOcj172BgpEEruFlMRSNythoreHpOlZptiGRzQfb4Uzi'; // Replace with your PayPal client ID
+const clientSecret = 'ENq_yNAF_KcrNlsvaSZuU_3V9QLf8plkMzFBo0-F1ACqkXXCwEonBT9kcqyT48ZfsXysq1hLX1f8KF1Q'; // Replace with your PayPal client secret
+const baseURL = 'https://api-m.sandbox.paypal.com'; // Use 'https://api-m.paypal.com' for live environment
 // PayPal configuration
+
+// Endpoint to get PayPal access token
+app.get('/paypal-token', async (req, res) => {
+    const auth = btoa(`${clientId}:${clientSecret}`);
+    const response = await fetch('https://api-m.sandbox.paypal.com/v1/oauth2/token', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Basic ${auth}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'grant_type=client_credentials'
+    });
+
+    const data = await response.json();
+    res.json({ access_token: data.access_token });
+});
+
 // Helper function to get access token
 async function getAccessToken() {
     const response = await fetch(`${baseURL}/v1/oauth2/token`, {
