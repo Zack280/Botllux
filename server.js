@@ -37,7 +37,7 @@ async function getAccessToken() {
     return cachedToken;
 }
 
-app.post('/create-paypal-order', async (req, res) => {
+app.post('https://api-m.paypal.com/v2/checkout/orders', async (req, res) => {
     try {
         const accessToken = await getAccessToken();
         const response = await fetch(`${baseURL}/v2/checkout/orders`, {
@@ -79,7 +79,7 @@ app.post('/create-paypal-order', async (req, res) => {
     }
 });
 
-app.post('/capture-paypal-order', async (req, res) => {
+app.post('https://api-m.paypal.com/v2/checkout/orders/{id}/capture', async (req, res) => {
     const { orderId } = req.body;
 
     if (!orderId) {
