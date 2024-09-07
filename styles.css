@@ -10,7 +10,7 @@
 body {
     font-family: 'Arial', sans-serif;
     background-color: #fff;
-    color: #333;
+    color: #A85112ff;
     line-height: 1.6;
 }
 
@@ -22,7 +22,7 @@ body {
 
 /* Header styles */
 header {
-    background-color: #fff;
+    background-color: #F3F3F3;
     padding: 20px 0;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     position: fixed;
@@ -52,7 +52,7 @@ header nav ul li {
 }
 
 header nav ul li a {
-    color: #333;
+    color: #A85112ff;
     text-decoration: none;
     font-size: 16px;
     transition: color 0.3s ease;
@@ -66,69 +66,6 @@ header .cart-icon img {
     width: 50px;
 }
 
-/* Hero section */
-.hero-section {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    color: #fff;
-    overflow: hidden;
-    background-color: #000;
-}
-
-.hero-content {
-    z-index: 10;
-}
-
-.hero-content h1 {
-    font-size: 48px;
-    margin-bottom: 20px;
-    color: #000;
-}
-
-.hero-content p {
-    font-size: 24px;
-    margin-bottom: 30px;
-}
-
-.cta-button {
-    display: inline-block;
-    padding: 15px 30px;
-    font-size: 18px;
-    color: #fff;
-    background-color: #EFAC69;
-    text-decoration: none;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-.cta-button:hover {
-    background-color: #ff3300;
-}
-
-.hero-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    overflow: hidden;
-}
-
-.hero-image {
-    width: 100%;
-    height: auto; /* Maintain aspect ratio */
-    object-fit: contain; /* Adjusts the image to fit within the container without cropping */
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1; /* Ensure the image is behind the hero content */
-}
 
 /* Products section */
 .products-section {
@@ -165,7 +102,7 @@ header .cart-icon img {
 .product-card h3 {
     font-size: 20px;
     margin-bottom: 10px;
-    color: #333;
+    color: #A85112ff;
 }
 
 .product-card .price {
@@ -261,7 +198,7 @@ header .cart-icon img {
 
 /* Footer styles */
 footer {
-    background-color: #333;
+    background-color: #A85112ff;
     color: #fff;
     padding: 20px 0;
     text-align: center;
@@ -273,4 +210,147 @@ footer p {
 }
 
 
+/* Hero section */
+.hero-section {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #696866; /* Dark Gray */
+    overflow: hidden;
+    background-color: #E5E3E2; /* Light Gray Background */
+}
 
+.hero-content {
+    z-index: 10;
+}
+
+
+
+
+
+.hero-content h1 {
+    font-size: 60px;
+    margin-bottom: 20px;
+    color: #696866; /* Dark Gray */
+    font-family: 'Arial Black', sans-serif; /* Hip-hop inspired font */
+}
+
+.hero-content p {
+    font-size: 24px;
+    margin-bottom: 30px;
+    color: #696866; /* Dark Gray */
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 15px 30px;
+    font-size: 18px;
+    color: #F3F3F3; /* Light Gray */
+    background-color: #696866; /* Dark Gray */
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+    background-color: #B9B5B2; /* Neutral */
+    color: #696866; /* Dark Gray */
+}
+
+.hero-background {
+    background-color: #1E614Eff;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    overflow:  hidden;
+}
+
+.image-slider {
+    position: absolute;
+    top: 0;
+    left: -50%;
+    width: 100%;
+    height: 100%;
+}
+
+.image-slider img {
+    position: absolute;
+    width: auto;
+    height: 100%;
+    object-fit: cover; /* Cover the entire area while maintaining aspect ratio */
+    opacity: 0;
+    animation: slideAnimation 20s infinite;
+}
+
+
+.image-slider img:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.image-slider img:nth-child(2) {
+    animation-delay: 5s;
+}
+
+.image-slider img:nth-child(3) {
+    animation-delay: 10s; /* Swapped with the 3rd image */
+}
+
+.image-slider img:nth-child(4) {
+    animation-delay: 15s; /* Swapped with the 4th image */
+}
+
+@keyframes slideAnimation {
+    0% {
+        opacity: 0;
+    }
+    5% {
+        opacity: 1;
+    }
+    20% {
+        opacity: 1;
+    }
+    25% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* Apply the keyframe animation to all images */
+.image-slider img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    animation: slideAnimation 20s infinite; /* Make sure to set the animation duration to 20s */
+}
+
+
+/* Adjust hero section for phone resolutions */
+@media only screen and (max-width: 600px) {
+    .hero-section {
+        height: 40vh; /* Adjust the height as needed */
+    }
+
+    .hero-background,
+    .image-slider img {
+        height: 50vh; /* Ensure the images also scale with the hero section */
+    }
+
+    .hero-content h1 {
+        font-size: 36px; /* Adjust font size for smaller screens */
+    }
+
+    .hero-content p {
+        font-size: 18px; /* Adjust paragraph font size */
+    }
+}
